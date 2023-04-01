@@ -43,8 +43,7 @@ fn expresion(iter: &mut Peekable<Chars>) -> i32 {
         match token.tipo {
             TokenTipo::Suma     => {resultado += termino(iter)}
             TokenTipo::Resta    => {resultado -= termino(iter)}
-            TokenTipo::Final    => break,
-            _ => panic!("Se esperaba suma o resta")
+            _ => break
         }
     }
 
@@ -97,9 +96,9 @@ fn siguiente_token(iter: &mut Peekable<Chars>) -> Token {
             Some(caracter) => {
                 let mut acumulador = String::from(caracter);
                 loop {    
-                    let siguiente_caracter = iter.next();
+                    let siguiente_caracter = iter.clone().next();
                     match siguiente_caracter {
-                        Some(caracter_numerico) if caracter_numerico.is_numeric() => acumulador.push(caracter_numerico),
+                        Some(caracter_numerico) if caracter_numerico.is_numeric() => {iter.next(); acumulador.push(caracter_numerico)},
                         _ => break,
                     }
                 }
