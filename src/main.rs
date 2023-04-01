@@ -17,7 +17,7 @@ struct Token {
 fn main() {
     let mut input = String::new();
 
-    print!("> ");
+    print!("Calcular: ");
     io::stdout().flush().expect("No se pudo leer su input");
 
     io::stdin().read_line(&mut input).expect("No se pudo leer su input");
@@ -31,7 +31,7 @@ fn parse(iter: &mut Peekable<Chars>) {
 
     let resultado = expresion(iter);
 
-    println!("> {resultado}");
+    println!("Resultado: {resultado}");
 }
 
 fn expresion(iter: &mut Peekable<Chars>) -> i32 {
