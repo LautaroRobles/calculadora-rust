@@ -53,7 +53,7 @@ fn expresion(iter: &mut Peekable<Chars>) -> i32 {
 
 fn termino(iter: &mut Peekable<Chars>) -> i32 {
     
-    let mut numero = siguiente_numero(iter);
+    let mut resultado = siguiente_numero(iter);
 
     loop {
         let token = siguiente_token(&mut iter.clone()); // Veo el siguiente token sin avanzar
@@ -65,13 +65,13 @@ fn termino(iter: &mut Peekable<Chars>) -> i32 {
         }
 
         match token.tipo {
-            TokenTipo::Multiplicacion   => numero *= siguiente_numero(iter),
-            TokenTipo::Division         => numero /= siguiente_numero(iter),
+            TokenTipo::Multiplicacion   => resultado *= siguiente_numero(iter),
+            TokenTipo::Division         => resultado /= siguiente_numero(iter),
             _ => break
         }
     }
 
-    return numero;
+    return resultado;
 }
 
 fn siguiente_numero(iter: &mut Peekable<Chars>) -> i32 {
