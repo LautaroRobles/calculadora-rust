@@ -1,5 +1,5 @@
 # Calculadora usando RUST
-Esto es una calculadora que parsea la entrada de un usuario desde stdin y en stdout escribe el resultado de calculado.
+Esto es una calculadora que parsea la entrada de un usuario desde stdin y en stdout escribe el resultado calculado.
 
 ![imagen](https://pbs.twimg.com/media/E63X37_WUAEOXPg.jpg)
 
