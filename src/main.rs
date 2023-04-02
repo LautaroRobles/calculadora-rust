@@ -1,17 +1,12 @@
 use std::{io::{self, Write}, iter::Peekable, str::Chars};
 
-enum TokenTipo {
-    Numero,
+enum Token {
+    Numero(i32),
     Suma,
     Resta,
     Multiplicacion,
     Division,
     Final,
-}
-
-struct Token {
-    tipo: TokenTipo,
-    valor: Option<i32>,
 }
 
 fn main() {
@@ -38,11 +33,9 @@ fn expresion(iter: &mut Peekable<Chars>) -> i32 {
     let mut resultado = termino(iter);
 
     loop {
-        let token = siguiente_token(iter);
-
-        match token.tipo {
-            TokenTipo::Suma     => {resultado += termino(iter)}
-            TokenTipo::Resta    => {resultado -= termino(iter)}
+        match siguiente_token(iter) {
+            Token::Suma     => {resultado += termino(iter)}
+            Token::Resta    => {resultado -= termino(iter)}
             _ => break
         }
     }
@@ -57,15 +50,15 @@ fn termino(iter: &mut Peekable<Chars>) -> i32 {
     loop {
         let token = siguiente_token(&mut iter.clone()); // Veo el siguiente token sin avanzar
 
-        // Pero si el siguiente token es Division o Multiplicacion lo consumo
-        match token.tipo {
-            TokenTipo::Division | TokenTipo::Multiplicacion => {siguiente_token(iter); ()},
+        // Si el siguiente token es Division o Multiplicacion, lo consumo (o sea muto iter)
+        match token {
+            Token::Division | Token::Multiplicacion => {siguiente_token(iter);},
             _ => (),
         }
 
-        match token.tipo {
-            TokenTipo::Multiplicacion   => resultado *= siguiente_numero(iter),
-            TokenTipo::Division         => resultado /= siguiente_numero(iter),
+        match token {
+            Token::Multiplicacion   => resultado *= siguiente_numero(iter),
+            Token::Division         => resultado /= siguiente_numero(iter),
             _ => break
         }
     }
@@ -76,8 +69,8 @@ fn termino(iter: &mut Peekable<Chars>) -> i32 {
 fn siguiente_numero(iter: &mut Peekable<Chars>) -> i32 {
     let token = siguiente_token(iter);
     
-    match token.tipo {
-        TokenTipo::Numero => token.valor.unwrap(),
+    match token {
+        Token::Numero(numero) => numero,
         _ => panic!("Se esperaba un numero"),
     }
 }
@@ -87,12 +80,12 @@ fn siguiente_token(iter: &mut Peekable<Chars>) -> Token {
     loop {        
         match iter.next() {
             Some(' ')   => continue,
-            None        => return Token {tipo: (TokenTipo::Final), valor: None},
-            Some('\n')  => return Token {tipo: (TokenTipo::Final), valor: None},
-            Some('+')   => return Token { tipo: (TokenTipo::Suma), valor: None },
-            Some('-')   => return Token { tipo: (TokenTipo::Resta), valor: None },
-            Some('*')   => return Token { tipo: (TokenTipo::Multiplicacion), valor: None },
-            Some('/')   => return Token { tipo: (TokenTipo::Division), valor: None },
+            None        => return Token::Final,
+            Some('\n')  => return Token::Final,
+            Some('+')   => return Token::Suma,
+            Some('-')   => return Token::Resta,
+            Some('*')   => return Token::Multiplicacion,
+            Some('/')   => return Token::Division,
             Some(caracter) => {
                 let mut acumulador = String::from(caracter);
                 loop {    
@@ -104,7 +97,7 @@ fn siguiente_token(iter: &mut Peekable<Chars>) -> Token {
                 }
 
                 match acumulador.parse::<i32>() {
-                    Ok(numero) => return Token {tipo: (TokenTipo::Numero), valor: Some(numero)},
+                    Ok(numero) => return Token::Numero(numero),
                     Err(_) => panic!("Error, se esperaba numero"),
                 }
 
