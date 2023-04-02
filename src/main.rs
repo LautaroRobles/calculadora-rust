@@ -1,4 +1,4 @@
-use std::{io::{self, Write}, iter::Peekable, str::Chars};
+use std::{io::{self, Write}, iter::Peekable, str::Chars, fmt};
 
 enum Token {
     Numero(i32),
@@ -7,6 +7,24 @@ enum Token {
     Multiplicacion,
     Division,
     Final,
+}
+
+impl fmt::Display for Token {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Write strictly the first element into the supplied output
+        // stream: `f`. Returns `fmt::Result` which indicates whether the
+        // operation succeeded or failed. Note that `write!` uses syntax which
+        // is very similar to `println!`.
+        match self {
+            Token::Numero(numero) => write!(f, "{}", numero),
+            Token::Suma => write!(f, "Suma"),
+            Token::Resta => write!(f, "Resta"),
+            Token::Multiplicacion => write!(f, "Multiplicacion"),
+            Token::Division => write!(f, "Division"),
+            Token::Final => write!(f, "Final"),
+        }
+    }
 }
 
 fn main() {
@@ -36,7 +54,8 @@ fn expresion(iter: &mut Peekable<Chars>) -> i32 {
         match siguiente_token(iter) {
             Token::Suma     => {resultado += termino(iter)}
             Token::Resta    => {resultado -= termino(iter)}
-            _ => break
+            Token::Final    => break,
+            token => panic!("Se esperaba Suma, Resta o Final pero se obtuvo {}", token),
         }
     }
 
@@ -53,13 +72,13 @@ fn termino(iter: &mut Peekable<Chars>) -> i32 {
         // Si el siguiente token es Division o Multiplicacion, lo consumo (o sea muto iter)
         match token {
             Token::Division | Token::Multiplicacion => {siguiente_token(iter);},
-            _ => (),
+            _ => break,
         }
 
         match token {
             Token::Multiplicacion   => resultado *= siguiente_numero(iter),
             Token::Division         => resultado /= siguiente_numero(iter),
-            _ => break
+            token => panic!("Se esperaba Multiplicacion o Division pero se obtuvo {}", token),
         }
     }
 
@@ -71,7 +90,7 @@ fn siguiente_numero(iter: &mut Peekable<Chars>) -> i32 {
     
     match token {
         Token::Numero(numero) => numero,
-        _ => panic!("Se esperaba un numero"),
+        _ => panic!("Se esperaba Numero, se obtuvo {token}"),
     }
 }
 
@@ -98,7 +117,7 @@ fn siguiente_token(iter: &mut Peekable<Chars>) -> Token {
 
                 match acumulador.parse::<i32>() {
                     Ok(numero) => return Token::Numero(numero),
-                    Err(_) => panic!("Error, se esperaba numero"),
+                    Err(_) => panic!("Error no se pudo parsear [{acumulador}] como numero"),
                 }
 
             }
